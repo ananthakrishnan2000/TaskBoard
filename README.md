@@ -1,12 +1,3 @@
-# TaskBoard Pro
+# TaskBoard
 
-This project contains both **Frontend** and **Backend** modules for a Task Management system.
-
-### Folder Structure
-- **frontend/** → React 
-- **backend/** → Node.js + Express REST API  
-- **TaskBoardPro Est Doc.pdf** → Project planning and estimation
-
-### Tech Stack
-- **Frontend:** React, Tailwind CSS
-- **Backend:** Node.js, Express, MongoDB
+A MERN stack-based project and task management application that allows users to create, organize, and track tasks under specific projects.
