@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { registerUser } from '../../services/authService';
+import Toast from '../UI/Toast';
 
 const Register = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +12,17 @@ const Register = ({ switchToLogin }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { login } = useAuth();
+
+  const showToastMessage = (message, type = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,12 +83,29 @@ const Register = ({ switchToLogin }) => {
     try {
       const { confirmPassword, ...registerData } = formData;
       const response = await registerUser(registerData);
-      login(response.user, response.token);
+      
+      // Show success toast
+      showToastMessage('Account created successfully!', 'success');
+      setRegistrationSuccess(true);
+      
+      // Clear form
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      });
+      
     } catch (error) {
+      showToastMessage(error.message, 'error');
       setErrors({ submit: error.message });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoginRedirect = () => {
+    switchToLogin();
   };
 
   // Enhanced styles with better spacing
@@ -121,7 +149,7 @@ const Register = ({ switchToLogin }) => {
     form: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '28px' // Increased gap for better spacing
+      gap: '28px'
     },
     formGroup: {
       display: 'flex',
@@ -130,12 +158,12 @@ const Register = ({ switchToLogin }) => {
     label: {
       fontWeight: '600',
       color: '#2d3748',
-      marginBottom: '10px', // Increased margin
+      marginBottom: '10px',
       fontSize: '14px',
       display: 'block'
     },
     input: {
-      padding: '12px 16px', // Increased padding
+      padding: '14px 16px',
       border: '2px solid #e2e8f0',
       borderRadius: '8px',
       fontSize: '16px',
@@ -157,23 +185,13 @@ const Register = ({ switchToLogin }) => {
     errorMessage: {
       color: '#e53e3e',
       fontSize: '14px',
-      marginTop: '8px', // Increased margin
+      marginTop: '8px',
       display: 'flex',
       alignItems: 'center',
       gap: '6px'
     },
-    submitError: {
-      textAlign: 'center',
-      padding: '16px', // Increased padding
-      backgroundColor: '#fed7d7',
-      border: '1px solid #feb2b2',
-      borderRadius: '8px',
-      color: '#c53030',
-      fontSize: '14px',
-      marginBottom: '8px'
-    },
     button: {
-      padding: '16px 24px', // Increased padding
+      padding: '16px 24px',
       border: 'none',
       borderRadius: '8px',
       fontSize: '16px',
@@ -183,7 +201,7 @@ const Register = ({ switchToLogin }) => {
       background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
       color: 'white',
       transition: 'all 0.3s ease',
-      marginTop: '12px' // Added top margin
+      marginTop: '12px'
     },
     buttonHover: {
       transform: 'translateY(-1px)',
@@ -194,10 +212,23 @@ const Register = ({ switchToLogin }) => {
       cursor: 'not-allowed',
       transform: 'none'
     },
+    loginButton: {
+      padding: '16px 24px',
+      border: 'none',
+      borderRadius: '8px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      width: '100%',
+      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      color: 'white',
+      transition: 'all 0.3s ease',
+      marginTop: '12px'
+    },
     switch: {
       textAlign: 'center',
-      marginTop: '32px', // Increased margin
-      paddingTop: '28px', // Increased padding
+      marginTop: '32px',
+      paddingTop: '28px',
       borderTop: '1px solid #e2e8f0'
     },
     switchText: {
@@ -224,19 +255,48 @@ const Register = ({ switchToLogin }) => {
       color: '#a0aec0',
       marginTop: '6px',
       marginBottom: '0'
+    },
+    successMessage: {
+      textAlign: 'center',
+      padding: '20px',
+      backgroundColor: '#d1fae5',
+      border: '1px solid #a7f3d0',
+      borderRadius: '8px',
+      color: '#065f46',
+      marginBottom: '20px'
     }
   };
 
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [isLoginButtonHovered, setIsLoginButtonHovered] = useState(false);
   const [isLinkHovered, setIsLinkHovered] = useState(false);
 
   return (
     <div style={styles.container}>
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast 
+          message={toastMessage} 
+          type={toastType} 
+          onClose={() => setShowToast(false)} 
+        />
+      )}
+
       <div style={styles.card}>
         <h2 style={styles.title}>Create Account</h2>
         <p style={styles.subtitle}>
           Join TaskBoard Pro and start managing your projects efficiently
         </p>
+
+        {/* Success Message */}
+        {registrationSuccess && (
+          <div style={styles.successMessage}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#065f46' }}>🎉 Registration Successful!</h3>
+            <p style={{ margin: '0', color: '#047857' }}>
+              Your account has been created successfully. You can now login to access your dashboard.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {/* Name Field */}
@@ -267,6 +327,7 @@ const Register = ({ switchToLogin }) => {
                 e.target.style.boxShadow = 'none';
               }}
               placeholder="Enter your full name"
+              disabled={registrationSuccess}
             />
             {errors.name && (
               <span style={styles.errorMessage}>
@@ -303,6 +364,7 @@ const Register = ({ switchToLogin }) => {
                 e.target.style.boxShadow = 'none';
               }}
               placeholder="Enter your email address"
+              disabled={registrationSuccess}
             />
             {errors.email && (
               <span style={styles.errorMessage}>
@@ -339,6 +401,7 @@ const Register = ({ switchToLogin }) => {
                 e.target.style.boxShadow = 'none';
               }}
               placeholder="Create a strong password"
+              disabled={registrationSuccess}
             />
             {errors.password ? (
               <span style={styles.errorMessage}>
@@ -379,6 +442,7 @@ const Register = ({ switchToLogin }) => {
                 e.target.style.boxShadow = 'none';
               }}
               placeholder="Re-enter your password"
+              disabled={registrationSuccess}
             />
             {errors.confirmPassword && (
               <span style={styles.errorMessage}>
@@ -387,51 +451,57 @@ const Register = ({ switchToLogin }) => {
             )}
           </div>
 
-          {/* Submit Error */}
-          {errors.submit && (
-            <div style={styles.submitError}>
-              ⚠️ {errors.submit}
-            </div>
-          )}
-
           {/* Submit Button */}
-          <button 
-            type="submit"
-            style={{
-              ...styles.button,
-              ...(isButtonHovered && !loading ? styles.buttonHover : {}),
-              ...(loading ? styles.buttonDisabled : {})
-            }}
-            disabled={loading}
-            onMouseEnter={() => setIsButtonHovered(true)}
-            onMouseLeave={() => setIsButtonHovered(false)}
-          >
-            {loading ? (
-              <span>Creating Account...</span>
-            ) : (
-              <span>Create Account</span>
-            )}
-          </button>
+          {!registrationSuccess ? (
+            <button 
+              type="submit"
+              style={{
+                ...styles.button,
+                ...(isButtonHovered && !loading ? styles.buttonHover : {}),
+                ...(loading ? styles.buttonDisabled : {})
+              }}
+              disabled={loading || registrationSuccess}
+              onMouseEnter={() => setIsButtonHovered(true)}
+              onMouseLeave={() => setIsButtonHovered(false)}
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          ) : (
+            <button 
+              type="button"
+              style={{
+                ...styles.loginButton,
+                ...(isLoginButtonHovered ? styles.buttonHover : {})
+              }}
+              onClick={handleLoginRedirect}
+              onMouseEnter={() => setIsLoginButtonHovered(true)}
+              onMouseLeave={() => setIsLoginButtonHovered(false)}
+            >
+              Proceed to Login
+            </button>
+          )}
         </form>
 
         {/* Switch to Login */}
-        <div style={styles.switch}>
-          <p style={styles.switchText}>
-            Already have an account?{' '}
-            <button 
-              type="button" 
-              onClick={switchToLogin} 
-              style={{
-                ...styles.link,
-                ...(isLinkHovered ? styles.linkHover : {})
-              }}
-              onMouseEnter={() => setIsLinkHovered(true)}
-              onMouseLeave={() => setIsLinkHovered(false)}
-            >
-              Sign In
-            </button>
-          </p>
-        </div>
+        {!registrationSuccess && (
+          <div style={styles.switch}>
+            <p style={styles.switchText}>
+              Already have an account?{' '}
+              <button 
+                type="button" 
+                onClick={switchToLogin} 
+                style={{
+                  ...styles.link,
+                  ...(isLinkHovered ? styles.linkHover : {})
+                }}
+                onMouseEnter={() => setIsLinkHovered(true)}
+                onMouseLeave={() => setIsLinkHovered(false)}
+              >
+                Sign In
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
