@@ -76,11 +76,24 @@ router.post("/login", async (req, res) => {
 // @route   GET /api/auth/me
 // @access  Private
 router.get("/me", protect, async (req, res) => {
-  res.status(200).json({
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-  });
+   try {
+    res.status(200).json({
+      success: true,
+      status: 200,
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      status: 500
+    });
+  }
 });
+  
 
 module.exports = router;
