@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { registerUser } from '../../services/authService';
-import Toast from '../UI/Toast';
 
 const Register = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -12,16 +11,40 @@ const Register = ({ switchToLogin }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState('success');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { login } = useAuth();
 
-  const showToastMessage = (message, type = 'success') => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
+  // Email domain validation function
+  const isValidEmailDomain = (email) => {
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    
+    if (!emailDomain) return false;
+
+    // List of popular legitimate email providers
+    const allowedDomains = [
+      // Google
+      'gmail.com', 'google.com', 'googlemail.com',
+      // Microsoft
+      'outlook.com', 'hotmail.com', 'live.com', 'msn.com',
+      // Yahoo
+      'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'ymail.com',
+      // Apple
+      'icloud.com', 'me.com', 'mac.com',
+      // Professional
+      'protonmail.com', 'proton.me', 'zoho.com', 'aol.com', 'gmx.com',
+      // Educational (common patterns)
+      'edu', 'ac.in', 'edu.in'
+    ];
+
+    // Allow educational domains (contains .edu)
+    if (emailDomain.includes('.edu')) {
+      return true;
+    }
+
+    // Allow specific country domains with common providers
+    const baseDomain = emailDomain.split('.').slice(-2).join('.');
+    
+    return allowedDomains.includes(emailDomain) || allowedDomains.includes(baseDomain);
   };
 
   const handleChange = (e) => {
@@ -52,6 +75,8 @@ const Register = ({ switchToLogin }) => {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
+    } else if (!isValidEmailDomain(formData.email)) {
+      newErrors.email = 'Please use a valid email provider (Gmail, Yahoo, Outlook, iCloud, etc.)';
     }
 
     if (!formData.password) {
@@ -84,9 +109,9 @@ const Register = ({ switchToLogin }) => {
       const { confirmPassword, ...registerData } = formData;
       const response = await registerUser(registerData);
       
-      // Show success toast
-      showToastMessage('Account created successfully!', 'success');
+      // Set registration success
       setRegistrationSuccess(true);
+      setErrors({ success: 'Account created successfully!' });
       
       // Clear form
       setFormData({
@@ -97,175 +122,224 @@ const Register = ({ switchToLogin }) => {
       });
       
     } catch (error) {
-      showToastMessage(error.message, 'error');
       setErrors({ submit: error.message });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLoginRedirect = () => {
+  const handleProceedToLogin = () => {
     switchToLogin();
   };
 
   // Enhanced styles with better spacing
+
   const styles = {
-    container: {
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '40px 20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    },
-    card: {
-      background: 'white',
-      padding: '48px 40px',
-      borderRadius: '16px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-      width: '100%',
-      maxWidth: '440px',
-      border: '1px solid rgba(255, 255, 255, 0.2)'
-    },
-    title: {
-      fontSize: '32px',
-      fontWeight: '700',
-      color: '#1a202c',
-      textAlign: 'center',
-      marginBottom: '12px',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
-    },
-    subtitle: {
-      color: '#718096',
-      textAlign: 'center',
-      marginBottom: '40px',
-      fontSize: '16px',
-      lineHeight: '1.5'
-    },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '28px'
-    },
-    formGroup: {
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    label: {
-      fontWeight: '600',
-      color: '#2d3748',
-      marginBottom: '10px',
-      fontSize: '14px',
-      display: 'block'
-    },
-    input: {
-      padding: '14px 16px',
-      border: '2px solid #e2e8f0',
-      borderRadius: '8px',
-      fontSize: '16px',
-      transition: 'all 0.3s ease',
-      width: '100%',
-      boxSizing: 'border-box',
-      backgroundColor: '#fafafa'
-    },
-    inputFocus: {
-      outline: 'none',
-      borderColor: '#4299e1',
-      backgroundColor: 'white',
-      boxShadow: '0 0 0 3px rgba(66, 153, 225, 0.1)'
-    },
-    inputError: {
-      borderColor: '#fc8181',
-      backgroundColor: '#fff5f5'
-    },
-    errorMessage: {
-      color: '#e53e3e',
-      fontSize: '14px',
-      marginTop: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px'
-    },
-    button: {
-      padding: '16px 24px',
-      border: 'none',
-      borderRadius: '8px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      width: '100%',
-      background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
-      color: 'white',
-      transition: 'all 0.3s ease',
-      marginTop: '12px'
-    },
-    buttonHover: {
-      transform: 'translateY(-1px)',
-      boxShadow: '0 4px 12px rgba(72, 187, 120, 0.3)'
-    },
-    buttonDisabled: {
-      opacity: 0.6,
-      cursor: 'not-allowed',
-      transform: 'none'
-    },
-    loginButton: {
-      padding: '16px 24px',
-      border: 'none',
-      borderRadius: '8px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      width: '100%',
-      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-      color: 'white',
-      transition: 'all 0.3s ease',
-      marginTop: '12px'
-    },
-    switch: {
-      textAlign: 'center',
-      marginTop: '32px',
-      paddingTop: '28px',
-      borderTop: '1px solid #e2e8f0'
-    },
-    switchText: {
-      color: '#718096',
-      margin: 0,
-      fontSize: '15px'
-    },
-    link: {
-      background: 'none',
-      border: 'none',
-      color: '#4299e1',
-      cursor: 'pointer',
-      fontWeight: '600',
-      fontSize: '15px',
-      textDecoration: 'none',
-      transition: 'color 0.2s ease'
-    },
-    linkHover: {
-      color: '#3182ce',
-      textDecoration: 'underline'
-    },
-    passwordHint: {
-      fontSize: '12px',
-      color: '#a0aec0',
-      marginTop: '6px',
-      marginBottom: '0'
-    },
-    successMessage: {
-      textAlign: 'center',
-      padding: '20px',
-      backgroundColor: '#d1fae5',
-      border: '1px solid #a7f3d0',
-      borderRadius: '8px',
-      color: '#065f46',
-      marginBottom: '20px'
-    }
-  };
+  container: {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 50%, #065f46 50%, #065f46 100%)',
+    padding: '40px 20px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  // Add these new styles for the background effect
+  backgroundEffect: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `
+      radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(34, 197, 94, 0.05) 0%, transparent 50%)
+    `,
+    zIndex: 0
+  },
+  card: {
+    background: 'rgba(255, 255, 255, 0.95)',
+    padding: '48px 40px',
+    borderRadius: '20px',
+    boxShadow: `
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(255, 255, 255, 0.2)
+    `,
+    width: '100%',
+    maxWidth: '440px',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    position: 'relative',
+    zIndex: 1
+  },
+  title: {
+    fontSize: '32px',
+    fontWeight: '700',
+    color: '#1a202c',
+    textAlign: 'center',
+    marginBottom: '12px',
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #065f46 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text'
+  },
+  subtitle: {
+    color: '#718096',
+    textAlign: 'center',
+    marginBottom: '40px',
+    fontSize: '16px',
+    lineHeight: '1.5'
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '28px'
+  },
+  formGroup: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  label: {
+    fontWeight: '600',
+    color: '#2d3748',
+    marginBottom: '10px',
+    fontSize: '14px',
+    display: 'block'
+  },
+  input: {
+    padding: '14px 16px',
+    border: '2px solid #e2e8f0',
+    borderRadius: '12px',
+    fontSize: '16px',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    boxSizing: 'border-box',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(5px)'
+  },
+  inputFocus: {
+    outline: 'none',
+    borderColor: '#3b82f6',
+    backgroundColor: 'white',
+    boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)'
+  },
+  inputError: {
+    borderColor: '#ef4444',
+    backgroundColor: 'rgba(254, 226, 226, 0.5)'
+  },
+  errorMessage: {
+    color: '#ef4444',
+    fontSize: '14px',
+    marginTop: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px'
+  },
+  successMessage: {
+    textAlign: 'center',
+    padding: '20px',
+    backgroundColor: 'rgba(209, 250, 229, 0.8)',
+    border: '1px solid #a7f3d0',
+    borderRadius: '12px',
+    color: '#065f46',
+    marginBottom: '20px',
+    backdropFilter: 'blur(5px)'
+  },
+  submitError: {
+    textAlign: 'center',
+    padding: '16px',
+    backgroundColor: 'rgba(254, 215, 215, 0.8)',
+    border: '1px solid #feb2b2',
+    borderRadius: '12px',
+    color: '#c53030',
+    fontSize: '14px',
+    marginBottom: '8px',
+    backdropFilter: 'blur(5px)'
+  },
+  button: {
+    padding: '16px 24px',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    width: '100%',
+    background: 'linear-gradient(135deg, #065f46 0%, #047857 100%)',
+    color: 'white',
+    transition: 'all 0.3s ease',
+    marginTop: '12px',
+    boxShadow: '0 4px 15px rgba(6, 95, 70, 0.3)'
+  },
+  loginButton: {
+    padding: '16px 24px',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    width: '100%',
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+    color: 'white',
+    transition: 'all 0.3s ease',
+    marginTop: '12px',
+    boxShadow: '0 4px 15px rgba(30, 58, 138, 0.3)'
+  },
+  buttonHover: {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 25px rgba(6, 95, 70, 0.4)'
+  },
+  loginButtonHover: {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 25px rgba(30, 58, 138, 0.4)'
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none'
+  },
+  switch: {
+    textAlign: 'center',
+    marginTop: '32px',
+    paddingTop: '28px',
+    borderTop: '1px solid rgba(226, 232, 240, 0.5)'
+  },
+  switchText: {
+    color: '#718096',
+    margin: 0,
+    fontSize: '15px'
+  },
+  link: {
+    background: 'none',
+    border: 'none',
+    color: '#3b82f6',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '15px',
+    textDecoration: 'none',
+    transition: 'color 0.2s ease'
+  },
+  linkHover: {
+    color: '#1e3a8a',
+    textDecoration: 'underline'
+  },
+  passwordHint: {
+    fontSize: '12px',
+    color: '#a0aec0',
+    marginTop: '6px',
+    marginBottom: '0'
+  },
+  emailHint: {
+    fontSize: '12px',
+    color: '#a0aec0',
+    marginTop: '6px',
+    marginBottom: '0'
+  }
+};
 
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isLoginButtonHovered, setIsLoginButtonHovered] = useState(false);
@@ -273,15 +347,7 @@ const Register = ({ switchToLogin }) => {
 
   return (
     <div style={styles.container}>
-      {/* Toast Notification */}
-      {showToast && (
-        <Toast 
-          message={toastMessage} 
-          type={toastType} 
-          onClose={() => setShowToast(false)} 
-        />
-      )}
-
+      <div style={styles.backgroundEffect}></div>
       <div style={styles.card}>
         <h2 style={styles.title}>Create Account</h2>
         <p style={styles.subtitle}>
@@ -366,10 +432,14 @@ const Register = ({ switchToLogin }) => {
               placeholder="Enter your email address"
               disabled={registrationSuccess}
             />
-            {errors.email && (
+            {errors.email ? (
               <span style={styles.errorMessage}>
                 ⚠️ {errors.email}
               </span>
+            ) : (
+              <p style={styles.emailHint}>
+                We accept Gmail, Yahoo, Outlook, iCloud, and educational emails
+              </p>
             )}
           </div>
 
@@ -451,7 +521,14 @@ const Register = ({ switchToLogin }) => {
             )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit Error */}
+          {errors.submit && (
+            <div style={styles.submitError}>
+              ⚠️ {errors.submit}
+            </div>
+          )}
+
+          {/* Submit Button or Proceed to Login */}
           {!registrationSuccess ? (
             <button 
               type="submit"
@@ -460,7 +537,7 @@ const Register = ({ switchToLogin }) => {
                 ...(isButtonHovered && !loading ? styles.buttonHover : {}),
                 ...(loading ? styles.buttonDisabled : {})
               }}
-              disabled={loading || registrationSuccess}
+              disabled={loading}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
             >
@@ -471,9 +548,9 @@ const Register = ({ switchToLogin }) => {
               type="button"
               style={{
                 ...styles.loginButton,
-                ...(isLoginButtonHovered ? styles.buttonHover : {})
+                ...(isLoginButtonHovered ? styles.loginButtonHover : {})
               }}
-              onClick={handleLoginRedirect}
+              onClick={handleProceedToLogin}
               onMouseEnter={() => setIsLoginButtonHovered(true)}
               onMouseLeave={() => setIsLoginButtonHovered(false)}
             >
@@ -482,7 +559,7 @@ const Register = ({ switchToLogin }) => {
           )}
         </form>
 
-        {/* Switch to Login */}
+        {/* Switch to Login (only show if not successful) */}
         {!registrationSuccess && (
           <div style={styles.switch}>
             <p style={styles.switchText}>

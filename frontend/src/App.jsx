@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './Components/Auth/Login.jsx';
-import Register from './Components/Auth/Register.jsx';
-// Remove Dashboard import for now since it's causing errors
-// import Dashboard from './Components/Dashboard/Dashboard';
+import Login from './Components/Auth/Login';
+import Register from './Components/Auth/Register';
+import ForgotPassword from './Components/Auth/ForgotPassword';
+import ResetPassword from './Components/Auth/ResetPassword';
+import Dashboard from './Components/Dashboard/Dashboard';
 
-// Remove CSS import temporarily
-// import './styles/App.css';
-
-const AuthWrapper = () => {
-  const [isLogin, setIsLogin] = useState(true);
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -18,58 +17,83 @@ const AuthWrapper = () => {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
+        height: '100vh',
         fontSize: '18px',
-        fontWeight: '600'
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white'
       }}>
-        Loading...
+        🔄 Checking authentication...
       </div>
     );
   }
 
-  if (user) {
-    // Temporary dashboard until we fix the import
+  return user ? children : <Navigate to="/login" />;
+};
+
+// Public Route component (redirect to dashboard if already authenticated)
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
     return (
-      <div style={{ padding: '20px' }}>
-        <h1>Welcome to Dashboard, {user?.name}!</h1>
-        <p>Email: {user?.email}</p>
-        <button onClick={() => { 
-          localStorage.removeItem('token'); 
-          localStorage.removeItem('user'); 
-          window.location.reload(); 
-        }} style={{ 
-          padding: '10px 20px', 
-          backgroundColor: '#ef4444', 
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '6px',
-          cursor: 'pointer'
-        }}>
-          Logout
-        </button>
-        <p style={{ marginTop: '20px', color: '#6b7280' }}>
-          Dashboard component will be implemented soon.
-        </p>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white'
+      }}>
+        🔄 Checking authentication...
       </div>
     );
   }
 
-  return isLogin ? (
-    <Login switchToRegister={() => setIsLogin(false)} />
-  ) : (
-    <Register switchToLogin={() => setIsLogin(true)} />
-  );
+  return user ? <Navigate to="/dashboard" /> : children;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="App">
-        <AuthWrapper />
-      </div>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <div className="App">
+          <Routes>
+            {/* Public routes - redirect to dashboard if authenticated */}
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
+            <Route path="/forgot-password" element={
+              <PublicRoute>
+                <ForgotPassword />
+              </PublicRoute>
+            } />
+            <Route path="/reset-password/:token" element={
+              <PublicRoute>
+                <ResetPassword />
+              </PublicRoute>
+            } />
+            
+            {/* Protected route - redirect to login if not authenticated */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Default route */}
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 }
 

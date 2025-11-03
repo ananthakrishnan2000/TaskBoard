@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { loginUser } from '../../services/authService';
+import { useParams, useNavigate } from 'react-router-dom';
+import { resetPassword } from '../../services/passwordService';
 
-const Login = () => { // Remove the switchToRegister prop
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+const ResetPassword = () => {
+  const { token } = useParams();
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,14 +31,16 @@ const Login = () => { // Remove the switchToRegister prop
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     setErrors(newErrors);
@@ -56,37 +58,21 @@ const Login = () => { // Remove the switchToRegister prop
     setErrors({});
 
     try {
-      console.log('📤 Sending login request...');
-      const response = await loginUser(formData);
-      console.log('✅ Login API response:', response);
+      await resetPassword(token, formData.password);
+      setMessage('Password reset successfully! You can now login with your new password.');
       
-      // Call login function from AuthContext
-      console.log('🔄 Calling AuthContext login...');
-      login(response.user, response.token);
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
       
-      console.log('✅ AuthContext login called successfully');
-      
-      // Use React Router navigation instead of window.location
-      console.log('🚀 Redirecting to dashboard...');
-      navigate('/dashboard');
-      
-    } catch (error) {
-      console.error('❌ Login error:', error);
-      setErrors({ submit: error.message });
+    } catch (err) {
+      setErrors({ submit: err.message });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleForgotPassword = () => {
-    navigate('/forgot-password');
-  };
-
-  const handleSignUp = () => {
-    navigate('/register'); // Add this function
-  };
-
-  // Inline styles instead of CSS file
   const styles = {
     container: {
       minHeight: '100vh',
@@ -99,7 +85,6 @@ const Login = () => { // Remove the switchToRegister prop
       position: 'relative',
       overflow: 'hidden'
     },
-
     backgroundEffect: {
       position: 'absolute',
       top: 0,
@@ -114,7 +99,6 @@ const Login = () => { // Remove the switchToRegister prop
       `,
       zIndex: 0
     },
-
     card: {
       background: 'rgba(255, 255, 255, 0.95)',
       padding: '48px 40px',
@@ -124,7 +108,7 @@ const Login = () => { // Remove the switchToRegister prop
         0 0 0 1px rgba(255, 255, 255, 0.2)
       `,
       width: '100%',
-      maxWidth: '400px',
+      maxWidth: '440px',
       backdropFilter: 'blur(10px)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
       position: 'relative',
@@ -159,11 +143,15 @@ const Login = () => { // Remove the switchToRegister prop
       fontSize: '14px'
     },
     input: {
-      padding: '12px 16px',
-      border: '2px solid #e5e7eb',
-      borderRadius: '6px',
+      padding: '14px 16px',
+      border: '1px solid #e2e8f0',
+      borderRadius: '8px',
       fontSize: '16px',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      width: '100%',
+      boxSizing: 'border-box',
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+      backdropFilter: 'blur(5px)'
     },
     inputError: {
       borderColor: '#ef4444'
@@ -171,15 +159,17 @@ const Login = () => { // Remove the switchToRegister prop
     errorMessage: {
       color: '#ef4444',
       fontSize: '14px',
-      marginTop: '4px'
+      marginTop: '8px'
     },
-    submitError: {
-      textAlign: 'center',
+    successMessage: {
+      color: '#065f46',
+      fontSize: '14px',
+      marginTop: '8px',
+      backgroundColor: '#d1fae5',
       padding: '12px',
-      backgroundColor: '#fef2f2',
-      border: '1px solid #fecaca',
-      borderRadius: '6px',
-      color: '#ef4444'
+      borderRadius: '8px',
+      border: '1px solid #a7f3d0',
+      textAlign: 'center'
     },
     button: {
       padding: '16px 24px',
@@ -189,74 +179,32 @@ const Login = () => { // Remove the switchToRegister prop
       fontWeight: '600',
       cursor: 'pointer',
       width: '100%',
-      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+      background: 'linear-gradient(135deg, #065f46 0%, #047857 100%)',
       color: 'white',
       transition: 'all 0.3s ease',
-      boxShadow: '0 4px 15px rgba(30, 58, 138, 0.3)'
+      marginTop: '12px',
+      boxShadow: '0 4px 15px rgba(6, 95, 70, 0.3)'
     },
     buttonDisabled: {
       opacity: 0.6,
       cursor: 'not-allowed'
-    },
-    switch: {
-      textAlign: 'center',
-      marginTop: '24px',
-      paddingTop: '24px',
-      borderTop: '1px solid #e5e7eb'
-    },
-    link: {
-      background: 'none',
-      border: 'none',
-      color: '#3b82f6',
-      cursor: 'pointer',
-      fontWeight: '600',
-      textDecoration: 'underline'
-    },
-    forgotPassword: {
-      background: 'none',
-      border: 'none',
-      color: '#3b82f6',
-      cursor: 'pointer',
-      fontSize: '14px',
-      textDecoration: 'underline',
-      marginTop: '16px',
-      textAlign: 'center',
-      width: '100%'
     }
   };
 
   return (
     <div style={styles.container}>
-      {/* Background Effect */}
       <div style={styles.backgroundEffect}></div>
       
       <div style={styles.card}>
-        <h2 style={styles.title}>Welcome Back</h2>
-        <p style={styles.subtitle}>Sign in to your TaskBoard Pro account</p>
+        <h2 style={styles.title}>Set New Password</h2>
+        <p style={styles.subtitle}>
+          Enter your new password below.
+        </p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
-            <label htmlFor="email" style={styles.label}>
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              style={{
-                ...styles.input,
-                ...(errors.email ? styles.inputError : {})
-              }}
-              placeholder="Enter your email"
-            />
-            {errors.email && <span style={styles.errorMessage}>{errors.email}</span>}
-          </div>
-
-          <div style={styles.formGroup}>
             <label htmlFor="password" style={styles.label}>
-              Password
+              New Password
             </label>
             <input
               type="password"
@@ -268,13 +216,42 @@ const Login = () => { // Remove the switchToRegister prop
                 ...styles.input,
                 ...(errors.password ? styles.inputError : {})
               }}
-              placeholder="Enter your password"
+              placeholder="Enter new password"
+              disabled={loading}
             />
             {errors.password && <span style={styles.errorMessage}>{errors.password}</span>}
           </div>
 
+          <div style={styles.formGroup}>
+            <label htmlFor="confirmPassword" style={styles.label}>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              style={{
+                ...styles.input,
+                ...(errors.confirmPassword ? styles.inputError : {})
+              }}
+              placeholder="Confirm new password"
+              disabled={loading}
+            />
+            {errors.confirmPassword && <span style={styles.errorMessage}>{errors.confirmPassword}</span>}
+          </div>
+
           {errors.submit && (
-            <div style={styles.submitError}>{errors.submit}</div>
+            <div style={styles.errorMessage}>{errors.submit}</div>
+          )}
+
+          {message && (
+            <div style={styles.successMessage}>
+              {message}
+              <br />
+              <small>Redirecting to login...</small>
+            </div>
           )}
 
           <button 
@@ -283,36 +260,14 @@ const Login = () => { // Remove the switchToRegister prop
               ...styles.button,
               ...(loading ? styles.buttonDisabled : {})
             }}
-            disabled={loading}
+            disabled={loading || message}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
-
-        {/* Forgot Password Link */}
-        <button 
-          type="button" 
-          onClick={handleForgotPassword}
-          style={styles.forgotPassword}
-        >
-          Forgot your password?
-        </button>
-
-        <div style={styles.switch}>
-          <p style={{ color: '#6b7280', margin: 0 }}>
-            Don't have an account?{' '}
-            <button 
-              type="button" 
-              onClick={handleSignUp} // Change this to handleSignUp
-              style={styles.link}
-            >
-              Sign Up
-            </button>
-          </p>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default ResetPassword;
