@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -134,7 +136,7 @@ const Dashboard = () => {
         {success && (
           <div className="success-banner">
             {success}
-            <button onClick={() => setSuccess('')} className="close-btn">×</button>
+            <button onClick={() => setSuccess('')} className="close-btn">Close</button>
           </div>
         )}
 
@@ -142,7 +144,7 @@ const Dashboard = () => {
         {error && (
           <div className="error-banner">
             {error}
-            <button onClick={() => setError('')} className="close-btn">×</button>
+            <button onClick={() => setError('')} className="close-btn">Close</button>
           </div>
         )}
 
@@ -170,7 +172,7 @@ const Dashboard = () => {
                   onClick={resetForm}
                   className="close-btn"
                 >
-                  ×
+                  Close
                 </button>
               </div>
               <form onSubmit={handleFormSubmit}>
@@ -274,7 +276,10 @@ const Dashboard = () => {
                       </span>
                     )}
                     <div className="project-actions">
-                      <button className="btn-outline">
+                      <button 
+                        className="btn-outline"
+                        onClick={() => navigate(`/projects/${project._id}/tasks`)}
+                      >
                         View Tasks
                       </button>
                     </div>

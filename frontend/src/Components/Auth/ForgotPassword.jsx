@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { forgotPassword } from '../../services/passwordService';
 
-const ForgotPassword = ({ switchToLogin }) => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -32,9 +32,8 @@ const ForgotPassword = ({ switchToLogin }) => {
   };
 
   const handleBackToLogin = () => {
-    navigate('/login'); // Make sure this exists
+    navigate('/login');
   };
-
 
   const styles = {
     container: {
@@ -211,7 +210,7 @@ const ForgotPassword = ({ switchToLogin }) => {
             Remember your password?{' '}
             <button 
               type="button" 
-              onClick={switchToLogin} 
+              onClick={handleBackToLogin} 
               style={styles.link}
             >
               Back to Login

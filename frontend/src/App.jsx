@@ -6,6 +6,7 @@ import Register from './Components/Auth/Register';
 import ForgotPassword from './Components/Auth/ForgotPassword';
 import ResetPassword from './Components/Auth/ResetPassword';
 import Dashboard from './Components/Dashboard/Dashboard';
+import TaskManagement from './Components/Tasks/TaskManagement';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -85,6 +86,13 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Tasks management route */}
+            <Route path="/projects/:projectId/tasks" element={
+              <ProtectedRoute>
+                <TaskManagement />
               </ProtectedRoute>
             } />
             

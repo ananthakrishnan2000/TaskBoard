@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { registerUser } from '../../services/authService';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = ({ switchToLogin }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -129,7 +131,21 @@ const Register = ({ switchToLogin }) => {
   };
 
   const handleProceedToLogin = () => {
-    switchToLogin();
+    // Use the prop if available, otherwise use navigate
+    if (switchToLogin && typeof switchToLogin === 'function') {
+      switchToLogin();
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleSignInClick = () => {
+    // Use the prop if available, otherwise use navigate
+    if (switchToLogin && typeof switchToLogin === 'function') {
+      switchToLogin();
+    } else {
+      navigate('/login');
+    }
   };
 
   // Enhanced styles with better spacing
@@ -566,7 +582,7 @@ const Register = ({ switchToLogin }) => {
               Already have an account?{' '}
               <button 
                 type="button" 
-                onClick={switchToLogin} 
+                onClick={handleSignInClick} 
                 style={{
                   ...styles.link,
                   ...(isLinkHovered ? styles.linkHover : {})

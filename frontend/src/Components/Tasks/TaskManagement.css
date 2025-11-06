@@ -1,0 +1,275 @@
+.task-management-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.task-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left h1 {
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.project-description {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+.task-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Task Actions */
+.task-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.task-stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Tasks Container */
+.tasks-container {
+  margin-top: 2rem;
+}
+
+.tasks-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Task Card */
+.task-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.task-title {
+  color: #1f2937;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.task-actions-header {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  font-size: 1rem;
+  color: #3b82f6;
+}
+
+.edit-btn:hover {
+  background: #dbeafe;
+}
+
+.delete-btn {
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+/* Task Details */
+.task-details {
+  margin-bottom: 1rem;
+}
+
+.task-details > div {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-badge {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-date, .task-created {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Task Footer */
+.task-footer {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.status-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.status-btn.active {
+  color: white;
+  border-color: transparent;
+}
+
+.status-btn:hover:not(.active) {
+  background: #e5e7eb;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* Loading and Error States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  text-align: center;
+}
+
+.error-container h2 {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .task-main {
+    padding: 1rem;
+  }
+  
+  .header-content {
+    padding: 0 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .task-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .task-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .tasks-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .status-actions {
+    justify-content: center;
+  }
+}
