@@ -34,7 +34,7 @@
 
 .user-info {
   display: flex;
-  align-items: center;
+  align-items: right;
   gap: 1rem;
 }
 

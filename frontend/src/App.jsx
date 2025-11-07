@@ -1,12 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import LandingPage from './Components/Landing/LandingPage';
 import Login from './Components/Auth/Login';
 import Register from './Components/Auth/Register';
 import ForgotPassword from './Components/Auth/ForgotPassword';
 import ResetPassword from './Components/Auth/ResetPassword';
 import Dashboard from './Components/Dashboard/Dashboard';
 import TaskManagement from './Components/Tasks/TaskManagement';
+import FloatingLoginButton from './Components/Common/FloatingLoginButton';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -59,8 +61,22 @@ function App() {
     <Router>
       <AuthProvider>
         <div className="App">
+          {/* Floating Button - Shows on all pages except auth pages */}
+          <Routes>
+            <Route path="/login" element={null} />
+            <Route path="/register" element={null} />
+            <Route path="/forgot-password" element={null} />
+            <Route path="/reset-password/:token" element={null} />
+            <Route path="*" element={<FloatingLoginButton />} />
+          </Routes>
+          
           <Routes>
             {/* Public routes - redirect to dashboard if authenticated */}
+            <Route path="/" element={
+              <PublicRoute>
+                <LandingPage />
+              </PublicRoute>
+            } />
             <Route path="/login" element={
               <PublicRoute>
                 <Login />
@@ -95,9 +111,6 @@ function App() {
                 <TaskManagement />
               </ProtectedRoute>
             } />
-            
-            {/* Default route */}
-            <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
       </AuthProvider>

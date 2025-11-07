@@ -22,6 +22,8 @@ const TaskManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
 
   useEffect(() => {
     fetchProjectAndTasks();
@@ -46,6 +48,13 @@ const TaskManagement = () => {
       setLoading(false);
     }
   };
+
+  // Filter tasks based on search and filter criteria
+  const filteredTasks = tasks.filter(task => {
+    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || task.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
@@ -176,9 +185,6 @@ const TaskManagement = () => {
               <p className="project-description">{project.description}</p>
             )}
           </div>
-          <div className="user-info">
-            <span>Welcome, {user?.name}</span>
-          </div>
         </div>
       </header>
 
@@ -211,6 +217,31 @@ const TaskManagement = () => {
           >
             + Add New Task
           </button>
+          
+          {/* Search and Filter Section */}
+          <div className="search-filter-container">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Search tasks..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <span className="search-icon">🔍</span>
+            </div>
+            
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="All">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
           
           <div className="task-stats">
             <span>Total: {tasks.length}</span>
@@ -276,11 +307,11 @@ const TaskManagement = () => {
 
         {/* Tasks List */}
         <div className="tasks-container">
-          {tasks.length === 0 ? (
+          {filteredTasks.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">📝</div>
-              <h3>No tasks yet</h3>
-              <p>Create your first task to get started with task management</p>
+              <div className="empty-icon" position = "right">🔍</div>
+              <h3>No tasks found</h3>
+              <p>Try adjusting your search or filter criteria</p>
               <button 
                 onClick={() => {
                   setEditingTask(null);
@@ -294,7 +325,7 @@ const TaskManagement = () => {
             </div>
           ) : (
             <div className="tasks-list">
-              {tasks.map(task => (
+              {filteredTasks.map(task => (
                 <div key={task._id} className="task-card">
                   <div className="task-header">
                     <h4 className="task-title">{task.title}</h4>
