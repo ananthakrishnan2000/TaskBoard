@@ -1,13 +1,11 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
 
-# Backend Service (Node.js)
 [[services]]
 name = "backend"
 source = "backend"
-run = "npm install && npm start"
+run = "npm start"
 
-# Frontend Static Site (React)
 [[static]]
 name = "frontend"
 source = "frontend"
