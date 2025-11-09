@@ -1,14 +1,13 @@
 [build]
 builder = "nixpacks"
 
-[deploy]
-startCommand = "cd backend && npm start"
-
+# Backend Service (Node.js)
 [[services]]
 name = "backend"
 source = "backend"
-run = "npm start"
+run = "npm install && npm start"
 
+# Frontend Static Site (React)
 [[static]]
 name = "frontend"
 source = "frontend"
