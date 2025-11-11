@@ -1,5 +1,7 @@
-// For testing without backend
-export const API_BASE_URL = 'http://localhost:5000/api';
+// For production - automatically switches between local and deployed
+export const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api'  // Same domain when deployed
+  : 'http://localhost:5000/api';
 
-// For demo purposes - remove this in production
+// For demo purposes
 export const DEMO_MODE = true;

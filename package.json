@@ -1,0 +1,13 @@
+
+{
+  "name": "taskboardpro",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo \"Root build for Railway\"",
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

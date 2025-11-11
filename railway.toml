@@ -2,12 +2,11 @@
 builder = "nixpacks"
 
 [[services]]
-name = "api"
-source = "backend"
-startCommand = "npm start"
+name = "backend"
+startCommand = "cd backend && npm start"
 
 [[static]]
-name = "web"
+name = "frontend"
 source = "frontend"
-buildCommand = "npm install && npm run build"
+buildCommand = "cd frontend && npm install && npm run build"
 output = "build"
