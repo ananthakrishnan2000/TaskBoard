@@ -302,57 +302,31 @@
 }
 
 .project-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .project-header {
- display: flex;
+  display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
 .project-header h3 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #1e293b; /* Slate-900 */
+  color: #1f2937;
   margin: 0;
-}
-
-.project-actions-header button {
-  border: none;
-  background: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: transform 0.2s ease;
-}
-
-.project-actions-header .edit-btn{
-    color: #0284c7; /* Sky-600 */
-}
-
-.project-actions-header .edit-btn:hover {
-  color: #0369a1;
-  transform: scale(1.1);
-}
-
-.project-actions-header .delete-btn {
-  color: #dc2626; /* Red-600 */
-}
-
-.project-actions-header .delete-btn:hover {
-  color: #b91c1c;
-  transform: scale(1.1);
+  font-size: 1.25rem;
+  line-height: 1.4;
 }
 
 .delete-btn {
@@ -377,25 +351,21 @@
 }
 
 .project-description {
-   margin: 10px 0 16px;
-  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
   line-height: 1.5;
-  color: #475569; /* Slate-600 */
+  min-height: 3rem;
 }
 
 .project-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  border-top: 1px solid #e2e8f0; /* Gray border */
-  padding-top: 10px;
-  gap: 8px;
 }
 
 .project-date {
- font-size: 0.9rem;
-  color: #64748b; /* Slate-500 */
+  color: #9ca3af;
+  font-size: 0.875rem;
 }
 
 .project-actions {
@@ -403,22 +373,23 @@
   gap: 0.5rem;
 }
 
-.project-actions .btn-outline {
-  border: 1px solid #0ea5e9; /* Sky-500 */
-  color: #0ea5e9;
-  background: transparent;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+.btn-outline {
+  background: none;
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s;
 }
 
-.project-actions .btn-outline:hover {
-  background: #0ea5e9;
+.btn-outline:hover {
+  background: #3b82f6;
   color: white;
 }
+
 /* Loading States */
 .loading-container {
   display: flex;
