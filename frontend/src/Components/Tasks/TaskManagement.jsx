@@ -220,16 +220,16 @@ const TaskManagement = () => {
           
           {/* Search and Filter Section */}
           <div className="search-filter-container">
-            <div className="search-box">
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-              <span className="search-icon">🔍</span>
-            </div>
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <span className="search-icon">🔍</span>
+          </div>
             
             <select
               value={statusFilter}
