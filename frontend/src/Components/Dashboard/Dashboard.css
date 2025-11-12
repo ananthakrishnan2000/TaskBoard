@@ -38,7 +38,7 @@
 }
 
 .user-info span {
-  color: #6b7280;
+  color: #1f2937;
   font-weight: 500;
 }
 
@@ -325,6 +325,7 @@
   color: #1f2937;
   margin: 0;
   font-size: 1.25rem;
+  font-family: 'Times New Roman', Times, serif;
   line-height: 1.4;
 }
 
