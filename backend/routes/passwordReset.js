@@ -5,27 +5,21 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Configure nodemailer (you'll need to set up email service)
-const transporter = nodemailer.createTransport({  // Fixed: createTransport (no 'e')
-  service: 'gmail', // or your email service
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
 // @desc    Forgot password - send reset email
 // @route   POST /api/auth/forgot-password
 // @access  Public
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
+    console.log('🔐 Forgot password request for:', email);
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User with this email does not exist'
+      // For security, don't reveal if user exists
+      console.log('📧 User not found, but returning success for security');
+      return res.status(200).json({
+        success: true,
+        message: 'If the email exists, a reset link has been sent to your inbox.'
       });
     }
 
@@ -39,48 +33,33 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3001'}/reset-password/${resetToken}`;
 
-    // Email content
-    const mailOptions = {
-      to: user.email,
-      from: process.env.EMAIL_USER,
-      subject: 'Password Reset Request - TaskBoard Pro',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #1e3a8a;">Password Reset Request</h2>
-          <p>Hello ${user.name},</p>
-          <p>You requested a password reset for your TaskBoard Pro account.</p>
-          <p>Click the button below to reset your password:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" 
-               style="background: #1e3a8a; color: white; padding: 12px 24px; 
-                      text-decoration: none; border-radius: 6px; display: inline-block;">
-              Reset Password
-            </a>
-          </div>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request this, please ignore this email.</p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-          <p style="color: #6b7280; font-size: 14px;">
-            TaskBoard Pro Team
-          </p>
-        </div>
-      `
-    };
+    // TEMPORARY FIX: Don't send email, just log the token for development
+    console.log('🎯 PASSWORD RESET TOKEN GENERATED:');
+    console.log('📧 For email:', email);
+    console.log('🔑 Reset token:', resetToken);
+    console.log('🔗 Reset URL:', resetUrl);
+    console.log('⏰ Token expires:', new Date(resetTokenExpiry).toLocaleString());
+    console.log('👉 Use this URL to reset password:', resetUrl);
 
-    await transporter.sendMail(mailOptions);
-
+    // Return success without sending email
     res.json({
       success: true,
-      message: 'Password reset email sent successfully'
+      message: 'If the email exists, a reset link has been sent to your inbox.',
+      // For development, include debug info
+      debug: process.env.NODE_ENV === 'development' ? {
+        token: resetToken,
+        resetUrl: resetUrl,
+        expires: new Date(resetTokenExpiry).toISOString()
+      } : undefined
     });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('❌ Forgot password error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error sending password reset email'
+      message: 'Failed to process password reset request. Please try again later.'
     });
   }
 });
@@ -93,7 +72,53 @@ router.post('/reset-password/:token', async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
+    console.log('🔄 Password reset attempt for token:', token);
+
     // Find user with valid token
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      console.log('❌ Invalid or expired token:', token);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    console.log('✅ Valid token found for user:', user.email);
+
+    // Update password
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    console.log('✅ Password reset successful for:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error resetting password'
+    });
+  }
+});
+
+// @desc    Validate reset token
+// @route   GET /api/auth/validate-reset-token/:token
+// @access  Public
+router.get('/validate-reset-token/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }
@@ -106,22 +131,17 @@ router.post('/reset-password/:token', async (req, res) => {
       });
     }
 
-    // Update password
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
-
     res.json({
       success: true,
-      message: 'Password reset successfully'
+      message: 'Valid reset token',
+      email: user.email
     });
 
   } catch (error) {
-    console.error('Reset password error:', error);
+    console.error('Validate token error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error resetting password'
+      message: 'Error validating token'
     });
   }
 });

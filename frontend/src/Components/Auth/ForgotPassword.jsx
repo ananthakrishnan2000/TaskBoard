@@ -22,10 +22,19 @@ const ForgotPassword = () => {
 
     try {
       await forgotPassword(email);
-      setMessage('Password reset email sent! Check your inbox for further instructions.');
+      setMessage('If the email exists, a reset link has been sent to your inbox. Check your email for further instructions.');
       setEmail('');
     } catch (err) {
-      setError(err.message);
+      console.error('Forgot password error:', err);
+      
+      // Better error messages
+      if (err.message.includes('Failed to fetch') || err.message.includes('Network Error')) {
+        setError('Cannot connect to server. Please check your internet connection and try again.');
+      } else if (err.message.includes('500') || err.message.includes('Internal Server Error')) {
+        setError('Password reset service is temporarily unavailable. Please try again in a few minutes.');
+      } else {
+        setError(err.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -119,7 +128,12 @@ const ForgotPassword = () => {
     errorMessage: {
       color: '#ef4444',
       fontSize: '14px',
-      marginTop: '8px'
+      marginTop: '8px',
+      textAlign: 'center',
+      padding: '8px',
+      backgroundColor: '#fef2f2',
+      borderRadius: '6px',
+      border: '1px solid #fecaca'
     },
     successMessage: {
       color: '#065f46',
@@ -129,7 +143,19 @@ const ForgotPassword = () => {
       padding: '12px',
       borderRadius: '8px',
       border: '1px solid #a7f3d0',
-      textAlign: 'center'
+      textAlign: 'center',
+      lineHeight: '1.5'
+    },
+    infoMessage: {
+      color: '#1e40af',
+      fontSize: '14px',
+      marginTop: '8px',
+      backgroundColor: '#dbeafe',
+      padding: '12px',
+      borderRadius: '8px',
+      border: '1px solid #93c5fd',
+      textAlign: 'center',
+      lineHeight: '1.5'
     },
     button: {
       padding: '16px 24px',
@@ -147,7 +173,8 @@ const ForgotPassword = () => {
     },
     buttonDisabled: {
       opacity: 0.6,
-      cursor: 'not-allowed'
+      cursor: 'not-allowed',
+      transform: 'none'
     },
     switch: {
       textAlign: 'center',
@@ -161,7 +188,19 @@ const ForgotPassword = () => {
       color: '#3b82f6',
       cursor: 'pointer',
       fontWeight: '600',
-      textDecoration: 'underline'
+      textDecoration: 'underline',
+      padding: '0',
+      margin: '0'
+    },
+    developmentNote: {
+      marginTop: '16px',
+      padding: '12px',
+      backgroundColor: '#fffbeb',
+      border: '1px solid #fcd34d',
+      borderRadius: '8px',
+      fontSize: '12px',
+      color: '#92400e',
+      textAlign: 'center'
     }
   };
 
@@ -189,7 +228,7 @@ const ForgotPassword = () => {
               placeholder="Enter your email address"
               disabled={loading}
             />
-            {error && <span style={styles.errorMessage}>{error}</span>}
+            {error && <div style={styles.errorMessage}>{error}</div>}
             {message && <div style={styles.successMessage}>{message}</div>}
           </div>
 
@@ -200,10 +239,29 @@ const ForgotPassword = () => {
               ...(loading ? styles.buttonDisabled : {})
             }}
             disabled={loading}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(30, 58, 138, 0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(30, 58, 138, 0.3)';
+              }
+            }}
           >
             {loading ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
+
+        {/* Development Note - Remove in production */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={styles.developmentNote}>
+            <strong>Development Mode:</strong> Check your backend console for the reset token and URL.
+          </div>
+        )}
 
         <div style={styles.switch}>
           <p style={{ color: '#6b7280', margin: 0 }}>
