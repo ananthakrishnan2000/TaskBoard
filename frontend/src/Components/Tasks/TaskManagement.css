@@ -25,9 +25,10 @@
 }
 
 .project-description {
-  color: #6b7280;
+  color: #9f9f9ffa;
+  font-family: 'Times New Roman', Times, serif;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
 }
 
 .back-btn {
