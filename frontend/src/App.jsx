@@ -13,7 +13,7 @@ import FloatingLoginButton from './Components/Common/FloatingLoginButton';
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-
+ 
   if (loading) {
     return (
       <div style={{ 

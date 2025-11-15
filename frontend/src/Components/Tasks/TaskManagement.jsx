@@ -194,10 +194,7 @@ const TaskManagement = () => {
             <button onClick={() => navigate("/dashboard")} className="back-btn">
               ← Back to Projects
             </button>
-            <h1>{project.name} - Tasks</h1>
-            {project.description && (
-              <p className="project-description">{project.description}</p>
-            )}
+            <h1>Tasks Management Dashboard</h1>
           </div>
         </div>
       </header>
