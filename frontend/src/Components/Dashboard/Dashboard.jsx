@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { getProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
-import './Dashboard.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../../services/projectService";
+import "./Dashboard.css";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -10,10 +15,10 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-  const [projectForm, setProjectForm] = useState({ name: '', description: '' });
+  const [projectForm, setProjectForm] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Fetch projects on component mount
   useEffect(() => {
@@ -25,9 +30,9 @@ const Dashboard = () => {
       setLoading(true);
       const projectsData = await getProjects();
       setProjects(projectsData);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Failed to load projects: ' + err.message);
+      setError("Failed to load projects: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -39,14 +44,14 @@ const Dashboard = () => {
       if (projectForm.name.trim()) {
         const project = await createProject(projectForm);
         setProjects([...projects, project]);
-        setProjectForm({ name: '', description: '' });
+        setProjectForm({ name: "", description: "" });
         setShowProjectForm(false);
-        setSuccess('Project created successfully!');
-        setError('');
-        setTimeout(() => setSuccess(''), 3000);
+        setSuccess("Project created successfully!");
+        setError("");
+        setTimeout(() => setSuccess(""), 3000);
       }
     } catch (err) {
-      setError('Failed to create project: ' + err.message);
+      setError("Failed to create project: " + err.message);
     }
   };
 
@@ -54,7 +59,7 @@ const Dashboard = () => {
     setEditingProject(project);
     setProjectForm({
       name: project.name,
-      description: project.description || ''
+      description: project.description || "",
     });
     setShowProjectForm(true);
   };
@@ -63,33 +68,42 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       if (projectForm.name.trim() && editingProject) {
-        const updatedProject = await updateProject(editingProject._id, projectForm);
-        setProjects(projects.map(project => 
-          project._id === editingProject._id ? updatedProject : project
-        ));
-        setProjectForm({ name: '', description: '' });
+        const updatedProject = await updateProject(
+          editingProject._id,
+          projectForm
+        );
+        setProjects(
+          projects.map((project) =>
+            project._id === editingProject._id ? updatedProject : project
+          )
+        );
+        setProjectForm({ name: "", description: "" });
         setShowProjectForm(false);
         setEditingProject(null);
-        setSuccess('Project updated successfully!');
-        setError('');
-        setTimeout(() => setSuccess(''), 3000);
+        setSuccess("Project updated successfully!");
+        setError("");
+        setTimeout(() => setSuccess(""), 3000);
       }
     } catch (err) {
-      setError('Failed to update project: ' + err.message);
+      setError("Failed to update project: " + err.message);
     }
   };
 
   const handleDeleteProject = async (projectId) => {
     try {
-      if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      if (
+        window.confirm(
+          "Are you sure you want to delete this project? This action cannot be undone."
+        )
+      ) {
         await deleteProject(projectId);
-        setProjects(projects.filter(project => project._id !== projectId));
-        setSuccess('Project deleted successfully!');
-        setError('');
-        setTimeout(() => setSuccess(''), 3000);
+        setProjects(projects.filter((project) => project._id !== projectId));
+        setSuccess("Project deleted successfully!");
+        setError("");
+        setTimeout(() => setSuccess(""), 3000);
       }
     } catch (err) {
-      setError('Failed to delete project: ' + err.message);
+      setError("Failed to delete project: " + err.message);
     }
   };
 
@@ -102,7 +116,7 @@ const Dashboard = () => {
   };
 
   const resetForm = () => {
-    setProjectForm({ name: '', description: '' });
+    setProjectForm({ name: "", description: "" });
     setShowProjectForm(false);
     setEditingProject(null);
   };
@@ -120,7 +134,7 @@ const Dashboard = () => {
       {/* Header */}
       <header className="dashboard-header">
         <div className="dashboard-header-content">
-          <h1>TaskBoard Pro</h1>
+          <h1>Project Management Dashboard</h1>
           <div className="user-info">
             <span>Welcome, {user?.name}</span>
             <button onClick={logout} className="logout-btn">
@@ -136,7 +150,9 @@ const Dashboard = () => {
         {success && (
           <div className="success-banner">
             {success}
-            <button onClick={() => setSuccess('')} className="close-btn">Close</button>
+            <button onClick={() => setSuccess("")} className="close-btn">
+              Close
+            </button>
           </div>
         )}
 
@@ -144,15 +160,17 @@ const Dashboard = () => {
         {error && (
           <div className="error-banner">
             {error}
-            <button onClick={() => setError('')} className="close-btn">Close</button>
+            <button onClick={() => setError("")} className="close-btn">
+              Close
+            </button>
           </div>
         )}
 
         <div className="dashboard-actions">
-          <button 
+          <button
             onClick={() => {
               setEditingProject(null);
-              setProjectForm({ name: '', description: '' });
+              setProjectForm({ name: "", description: "" });
               setShowProjectForm(true);
             }}
             className="btn-primary"
@@ -167,11 +185,10 @@ const Dashboard = () => {
           <div className="modal-overlay">
             <div className="modal-content">
               <div className="modal-header">
-                <h3>{editingProject ? 'Edit Project' : 'Create New Project'}</h3>
-                <button 
-                  onClick={resetForm}
-                  className="close-btn"
-                >
+                <h3>
+                  {editingProject ? "Edit Project" : "Create New Project"}
+                </h3>
+                <button onClick={resetForm} className="close-btn">
                   Close
                 </button>
               </div>
@@ -181,7 +198,9 @@ const Dashboard = () => {
                   <input
                     type="text"
                     value={projectForm.name}
-                    onChange={(e) => setProjectForm({...projectForm, name: e.target.value})}
+                    onChange={(e) =>
+                      setProjectForm({ ...projectForm, name: e.target.value })
+                    }
                     placeholder="Enter project name"
                     required
                     disabled={loading}
@@ -191,18 +210,31 @@ const Dashboard = () => {
                   <label>Description</label>
                   <textarea
                     value={projectForm.description}
-                    onChange={(e) => setProjectForm({...projectForm, description: e.target.value})}
+                    onChange={(e) =>
+                      setProjectForm({
+                        ...projectForm,
+                        description: e.target.value,
+                      })
+                    }
                     placeholder="Enter project description"
                     rows="3"
                     disabled={loading}
                   />
                 </div>
                 <div className="form-actions">
-                  <button type="submit" className="btn-success" disabled={loading}>
-                    {loading ? 'Saving...' : (editingProject ? 'Update Project' : 'Create Project')}
+                  <button
+                    type="submit"
+                    className="btn-success"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Saving..."
+                      : editingProject
+                      ? "Update Project"
+                      : "Create Project"}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={resetForm}
                     className="btn-secondary"
                     disabled={loading}
@@ -221,16 +253,18 @@ const Dashboard = () => {
             <h2>Your Projects</h2>
             <span className="projects-count">({projects.length})</span>
           </div>
-          
+
           {projects.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">📁</div>
               <h3>No projects yet</h3>
-              <p>Create your first project to get started with task management</p>
-              <button 
+              <p>
+                Create your first project to get started with task management
+              </p>
+              <button
                 onClick={() => {
                   setEditingProject(null);
-                  setProjectForm({ name: '', description: '' });
+                  setProjectForm({ name: "", description: "" });
                   setShowProjectForm(true);
                 }}
                 className="btn-primary"
@@ -240,12 +274,12 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="projects-list">
-              {projects.map(project => (
+              {projects.map((project) => (
                 <div key={project._id} className="project-card">
                   <div className="project-header">
                     <h3>{project.name}</h3>
                     <div className="project-actions-header">
-                      <button 
+                      <button
                         onClick={() => handleEditProject(project)}
                         className="edit-btn"
                         disabled={loading}
@@ -253,7 +287,7 @@ const Dashboard = () => {
                       >
                         ✏️
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDeleteProject(project._id)}
                         className="delete-btn"
                         disabled={loading}
@@ -264,21 +298,26 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <p className="project-description">
-                    {project.description || 'No description provided'}
+                    {project.description || "No description provided"}
                   </p>
                   <div className="project-footer">
                     <span className="project-date">
-                      Created: {new Date(project.createdAt).toLocaleDateString()}
+                      Created:{" "}
+                      {new Date(project.createdAt).toLocaleDateString()}
                     </span>
-                    {project.updatedAt && project.updatedAt !== project.createdAt && (
-                      <span className="project-date">
-                        Updated: {new Date(project.updatedAt).toLocaleDateString()}
-                      </span>
-                    )}
+                    {project.updatedAt &&
+                      project.updatedAt !== project.createdAt && (
+                        <span className="project-date">
+                          Updated:{" "}
+                          {new Date(project.updatedAt).toLocaleDateString()}
+                        </span>
+                      )}
                     <div className="project-actions">
-                      <button 
+                      <button
                         className="btn-outline"
-                        onClick={() => navigate(`/projects/${project._id}/tasks`)}
+                        onClick={() =>
+                          navigate(`/projects/${project._id}/tasks`)
+                        }
                       >
                         View Tasks
                       </button>
