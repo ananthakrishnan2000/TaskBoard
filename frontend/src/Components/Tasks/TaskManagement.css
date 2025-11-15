@@ -1,6 +1,6 @@
 .task-management-container {
   min-height: 100vh;
-  background-color: #74a9c0;
+  background-color: #9cd5ed;
 }
 
 .task-header {
@@ -45,6 +45,8 @@
   border-radius: 6px;
   transition: all 0.3s ease;
   margin-bottom: 8px;
+  left: 0;
+  position: absolute;
 }
 
 .back-btn:hover {
@@ -63,7 +65,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -103,7 +105,7 @@
 
 .task-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   margin-bottom: 1rem;
 }

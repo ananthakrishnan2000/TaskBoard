@@ -13,15 +13,21 @@
   z-index: 100;
 }
 
-.header-content {
-  max-width: 1200px;
+.dashboard-header-content{
   padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.header-content h1 {
+/* .header-content {
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+.dashboard-header-content h1 {
   color: #1f2937;
   font-size: 1.5rem;
   font-weight: 700;
@@ -411,12 +417,12 @@
     padding: 1rem;
   }
   
-  .header-content {
+  /* .dashboard-header-content {
     padding: 0 1rem;
     flex-direction: column;
     gap: 1rem;
     text-align: center;
-  }
+  } */
   
   .projects-list {
     grid-template-columns: 1fr;

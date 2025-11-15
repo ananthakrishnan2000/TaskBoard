@@ -119,7 +119,7 @@ const Dashboard = () => {
     <div className="dashboard-container">
       {/* Header */}
       <header className="dashboard-header">
-        <div className="header-content">
+        <div className="dashboard-header-content">
           <h1>TaskBoard Pro</h1>
           <div className="user-info">
             <span>Welcome, {user?.name}</span>
